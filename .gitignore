@@ -41,6 +41,11 @@ build/Release
 node_modules/
 jspm_packages/
 
+#server files
+images/
+gifs/
+userdb.sqlite
+
 # TypeScript v1 declaration files
 typings/
 
