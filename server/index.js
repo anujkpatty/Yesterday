@@ -11,6 +11,7 @@ const path = require('path')
 
 
 var sqlite3 = require("sqlite3");
+
 const { URLSearchParams } = require("url");
 
 
@@ -260,32 +261,45 @@ app.post('/add_friend', (req, res) => {
     db.run(sql, [user_one, user_two, 0], (err) => {
         if (err) {
             console.log(err)
-        } else {
-            res.sendStatus(200)
-        }
+        } 
     })
+
+    db.run(sql, [user_two, user_one, 1], (err) => {
+        if (err) {
+            console.log(err)
+        } 
+    })
+
+    res.sendStatus(200)
+
 })
 
 app.put('/remove_friend', (req, res) => {
     const user_one = req.body.user_one
     const user_two = req.body.user_two
-    const sql = 'DELETE FROM Friends WHERE ((User_one = ? AND User_two = ?) OR (User_two = ? AND User_one = ?)) AND (Status = 0 OR Status = 1)'
+    const sql = 'DELETE FROM Friends WHERE User_one = ? AND User_two = ? AND (Status = 0 OR Status = 1 OR Status = 2)'
 
-    db.run(sql, [user_one, user_two, user_one, user_two], (err) => {
+    db.run(sql, [user_one, user_two], (err) => {
         if (err) {
             console.log(err)
-        } else {
-            res.sendStatus(200)
         }
     })
+
+    db.run(sql, [user_two, user_one], (err) => {
+        if (err) {
+            console.log(err)
+        } 
+    })
+
+    res.sendStatus(200)
 })
 
 app.get('/relation', (req, res) => {
     const user_1 = req.query.user_1
     const user_2 = req.query.user_2
-    const sql = `SELECT * FROM Friends WHERE ((User_one = ? AND User_two = ?) OR (User_two = ? AND User_one = ?))`
+    const sql = `SELECT * FROM Friends WHERE (User_one = ? AND User_two = ?)`
 
-    db.get(sql, [user_1, user_2, user_1, user_2], (err, row) => {
+    db.get(sql, [user_1, user_2], (err, row) => {
         if (err) {
             console.log(err)
         } else {
@@ -296,7 +310,7 @@ app.get('/relation', (req, res) => {
                     user_2: row.user_two,
                 })
             } else {
-                res.send({relation: 2})
+                res.send({relation: 3})
             }
         }
     })
@@ -331,7 +345,7 @@ app.get('/search', (req, res) => {
 
 app.get('/requests', (req, res) => {
     const user = req.query.user
-    const sql = 'SELECT User_one FROM Friends WHERE User_two = ? AND Status = 0'
+    const sql = 'SELECT User_two FROM Friends WHERE User_one = ? AND Status = 1'
 
     db.all(sql, [user], (err, rows) => {
         if (err) {
@@ -339,7 +353,7 @@ app.get('/requests', (req, res) => {
         } else {
             let arr = []
             rows.forEach(row => {
-                arr.push(row.User_one)
+                arr.push(row.User_two)
             })
             console.log(arr)
             res.send(arr)
@@ -350,13 +364,37 @@ app.get('/requests', (req, res) => {
 app.put('/accept', (req, res) => {
     const user_one = req.body.user_one
     const user_two = req.body.user_two
-    const sql = 'UPDATE Friends SET Status = 1 WHERE User_one = ? AND User_two = ?'
+    const sql = 'UPDATE Friends SET Status = 2 WHERE User_one = ? AND User_two = ?'
 
     db.run(sql, [user_one, user_two], (err) => {
         if (err) {
             console.log(err)
+        }
+    })
+
+    db.run(sql, [user_two, user_one], (err) => {
+        if (err) {
+            console.log(err)
+        }
+    })
+
+    res.sendStatus(200)
+})
+
+app.get('/feed', (req, res) => {
+    const user = req.query.user
+    console.log(user)
+
+    const sql = 'SELECT * FROM Posts WHERE User IN (SELECT User_two FROM Friends WHERE User_one = ?)'
+
+    db.all(sql, [user], (err, rows) => {
+        if (err) {
+            console.log(err)
         } else {
-            res.sendStatus(200)
+            console.log(rows)
+            let arr = []
+            rows.forEach(row => arr.push(row.User))
+            res.send(arr)
         }
     })
 })
