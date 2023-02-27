@@ -9,7 +9,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from './src/AuthContext';
 
 import HomeScreen from './src/navigation/HomeScreen';
-import UploadScreen from './src/navigation/UploadScreen';
 import StartScreen from './src/navigation/StartScreen';
 import LoginScreen from './src/navigation/LoginScreen';
 import RegisterScreen from './src/navigation/RegisterScreen';

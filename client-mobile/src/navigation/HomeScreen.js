@@ -79,14 +79,14 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
   },
   text: {
-      fontSize: 14,
+      fontSize: 20,
       color: 'gray',
-      paddingLeft: 44,
+      paddingLeft: 14,
       paddingTop: 5,
   },
   image: {
-    height: 400,
-    width: 300,
+    height: 480,
+    width: 360,
     alignSelf: 'center',
     marginTop: 50,
   },
