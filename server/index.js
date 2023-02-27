@@ -410,11 +410,11 @@ function clear_posts() {
 }
 
 var now = new Date();
-var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999) - now;
+var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 25, 0, 0) - now;
 if (mil_to_12 < 0) {
      mil_to_12 += 86400000; // it's after 10am, try 10am tomorrow.
 }
-setTimeout(clear_posts, mil_to_12);
+setTimeout(() => {setInterval(clear_posts, 1000 * 60 * 60 * 24)}, mil_to_12)
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

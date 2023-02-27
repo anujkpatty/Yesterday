@@ -31,10 +31,10 @@ function HomeScreen({navigation}) {
     }
 
     const Item = ({name}) => (
-      <View>
-        <Text>{name}</Text>
-        <Image key={name} source={{uri: `http://localhost:3001/gif?user=${name}`}} alt="" style = {{width: 300, height: 400}} />
-      </View>
+      <>
+        <Image key={name} source={{uri: `http://localhost:3001/gif?user=${name}`}} alt="" style = {styles.image} />
+        <Text style={styles.text}>{name}</Text>
+      </>
     );
 
     useEffect(() => {
@@ -43,7 +43,7 @@ function HomeScreen({navigation}) {
     }, [])
 
     return(
-      <SafeAreaView >
+      <SafeAreaView style={styles.container}>
         <FlatList
           data={users}
           renderItem={({item}) => <Item name={item} />}
@@ -54,3 +54,47 @@ function HomeScreen({navigation}) {
 }
 
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 50,
+    paddingBottom: 0,
+    backgroundColor: 'white',
+    height: '100%',
+    justifyContent: 'center',
+  },
+  input: {
+      height: 35,
+      margin: 12,
+      padding: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: 'gray'
+  },
+  button: {
+      height: 35,
+      margin: 12,
+      borderWidth: 1,
+      borderRadius: 2,
+      backgroundColor: 'black',
+      justifyContent: 'center',
+  },
+  text: {
+      fontSize: 14,
+      color: 'gray',
+      paddingLeft: 44,
+      paddingTop: 5,
+  },
+  image: {
+    height: 400,
+    width: 300,
+    alignSelf: 'center',
+    marginTop: 50,
+  },
+  post_container: {
+    height: 500,
+    width: 300,
+    justifyContent: 'center'
+  }
+
+  
+});

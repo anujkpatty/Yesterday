@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import Axios from "axios";
 
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -10,6 +10,7 @@ import { AuthContext } from './src/AuthContext';
 
 import HomeScreen from './src/navigation/HomeScreen';
 import UploadScreen from './src/navigation/UploadScreen';
+import StartScreen from './src/navigation/StartScreen';
 import LoginScreen from './src/navigation/LoginScreen';
 import RegisterScreen from './src/navigation/RegisterScreen';
 import SettingsScreen from './src/navigation/SettingsScreen';
@@ -85,7 +86,7 @@ export default function App() {
           SecureStore.setItemAsync('userToken', res.data.user)
           dispatch({ type: 'SIGN_IN', token: res.data.user});
         })
-        .catch(err => console.log(err));
+        .catch(err => alert('Invalid username or password'));
 
         
       },
@@ -117,6 +118,7 @@ export default function App() {
       <NavigationContainer>
         {state.userToken == null ? (
           <Stack.Navigator>
+            <Stack.Screen name="Start" options={{ headerShown: false }} component={StartScreen} />
             <Stack.Screen name="LogIn" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </Stack.Navigator>
