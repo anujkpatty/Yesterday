@@ -18,7 +18,7 @@ export default function SearchScreen({navigation}) {
     }
 
     const renderUsers = (names) => {
-        return names.map(name => <Text key={name} onPress={() => navigation.navigate('Profile', {user: name})}>{name}</Text>)
+        return names.map(name => <Text key={name} onPress={() => navigation.push('ProfileScreen', {user: name})}>{name}</Text>)
             
     }
 

@@ -50,8 +50,9 @@ var db = new sqlite3.Database(DBSOURCE, (err) => {
             });
         db.run(`CREATE TABLE Posts (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            User TEXT UNIQUE,
-            Path TEXT
+            User TEXT,
+            Path TEXT,
+            Status INTEGER
             )`, (err) => {
                 if (err) {
                     //do nothing
@@ -91,7 +92,6 @@ const upload = multer({ storage: storage, limits: { fieldSize: 25 * 1024 * 1024 
 
 
 app.post('/upload', upload.array('images'), function (req, res, next) {
-    console.log(req.body)
     var insert = 'REPLACE INTO Images (Path) VALUES (?)'
 
     for (let i = 0; i < req.files.length; i++) {
@@ -118,12 +118,9 @@ app.post('/login', (req, res) => {
     db.get(sql, [username, password], (err, row) => {
         if (err) {
             res.status(404).end('Account or password invalid')
-            console.log(row)
         } else if (!row) {
             res.status(404).end('Account or password invalid')
-            console.log("no row")
         } else {
-            console.log("success")
             res.json({user: row.Username})
         }
     })
@@ -132,8 +129,6 @@ app.post('/login', (req, res) => {
 app.post('/register', (req, res) => {
     const username = req.body.username
     const password = req.body.password
-
-    console.log(req.body)
 
     if (username && password) {
         const sql = `INSERT INTO Users (Username, Password) VALUES (?, ?)`
@@ -154,22 +149,36 @@ app.post('/register', (req, res) => {
 
 app.post('/create_post', (req, res) => {
     const user = req.body.user
-    const sql = 'REPLACE INTO Posts (User) VALUES (?)'
 
-    console.log(req.body)
+    let sql = 'SELECT Id id FROM Posts WHERE User = ? AND Status = 0'
 
-    db.run(sql, [user], (err) => {
+    db.get(sql, [user], (err, row) => {
         if (err) {
-            res.status(404)
+            console.log(err)
         } else {
-            db.get('SELECT Id id FROM Posts WHERE User = ?', [user], (err, row) => {
+            if (row) {
+                sql = 'DELETE FROM Posts WHERE Id = ?'
+                db.run(sql, [row.id], (err) => {
+                    if (err) {
+                        console.log(err)
+                    } 
+                })
+            }
+            sql = 'INSERT INTO Posts (User, Status) VALUES (?, 0)'
+            db.run(sql, [user], (err) => {
                 if (err) {
-                    res.status(404)
+                    console.log(err)
                 } else {
-                    console.log(row.id)
-                    res.json({postid: row.id})
+                    db.get('SELECT Id id FROM Posts WHERE User = ? AND Status = 0', [user], (err, row2) => {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            res.json({postid: row2.id})
+                        }
+                    })
                 }
             })
+            
         }
     })
 
@@ -227,18 +236,18 @@ app.get('/make_gif', (req, res) => {
 
 app.get('/gif', (req, res) => {
     const user = req.query.user
-    const sql = 'SELECT Path path FROM Posts WHERE User = ?'
+    const status = req.query.status
+    const sql = 'SELECT Path path FROM Posts WHERE User = ? AND Status = ?'
 
     if (!user) {
         res.sendStatus(404)
     } else {
-        db.get(sql, [user], (err, row) => {
+        db.get(sql, [user, status], (err, row) => {
             if (err) {
                 console.log(err);
             } else if (!row) {
                 res.sendStatus(404)
             } else {
-                console.log(user)
                 let path = row.path
                 fs.readFile(path, function(err, data) {
                     if (err) {
@@ -326,7 +335,6 @@ app.get('/search', (req, res) => {
         const sql =`SELECT Username FROM Users WHERE Username LIKE '${search}%' LIMIT 10`
         db.all(sql, (err, rows) => {
             if (err) {
-                console.log(sql)
                 console.log(err)
             } else {
                 let arr = []
@@ -335,7 +343,6 @@ app.get('/search', (req, res) => {
                         arr.push(row.Username)
                     }
                 })
-                console.log(arr)
                 res.send(arr)
             }
             
@@ -356,7 +363,6 @@ app.get('/requests', (req, res) => {
             rows.forEach(row => {
                 arr.push(row.User_two)
             })
-            console.log(arr)
             res.send(arr)
         }
     })
@@ -384,15 +390,13 @@ app.put('/accept', (req, res) => {
 
 app.get('/feed', (req, res) => {
     const user = req.query.user
-    console.log(user)
 
-    const sql = 'SELECT * FROM Posts WHERE User IN (SELECT User_two FROM Friends WHERE User_one = ?)'
+    const sql = 'SELECT * FROM Posts WHERE Status = 1 AND User IN (SELECT User_two FROM Friends WHERE User_one = ?)'
 
     db.all(sql, [user], (err, rows) => {
         if (err) {
             console.log(err)
         } else {
-            console.log(rows)
             let arr = []
             rows.forEach(row => arr.push(row.User))
             res.send(arr)
@@ -400,21 +404,58 @@ app.get('/feed', (req, res) => {
     })
 })
 
+app.get('/post_status', (req, res) => {
+    const user = req.query.user
+    const sql = 'SELECT Status FROM Posts WHERE User = ?'
+
+    db.all(sql, [user], (err, rows) => {
+        if (err) {
+            res.sendStatus(404)
+        } else {
+            if (rows) {
+                data = {today: 0, yesterday: 0}
+                rows.forEach((row) => {
+                    if (row.Status == 0) {
+                        data.today = 1
+                    }
+                    if (row.Status == 1) {
+                        data.yesterday = 1
+                    }
+                })
+                res.send(data)
+            } else {
+                res.sendStatus(200)
+            }
+            
+        }
+    })
+})
+
 function clear_posts() {
-    const sql = 'DELETE FROM Posts'
-    db.run(sql, (err) => {
+    let sql = 'DELETE FROM Posts WHERE Status = 1'
+    db.all(sql, (err) => {
         if (err) {
             console.log(err)
+        } else {
+            sql = 'UPDATE Posts SET Status = 1'
+            db.all(sql, (err) => {
+                if (err) {
+                    console.log(err)
+                }
+            })
         }
     })
 }
 
 var now = new Date();
-var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 25, 0, 0) - now;
+var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 1, 0, 0) - now;
 if (mil_to_12 < 0) {
      mil_to_12 += 86400000; // it's after 10am, try 10am tomorrow.
 }
-setTimeout(() => {setInterval(clear_posts, 1000 * 60 * 60 * 24)}, mil_to_12)
+setTimeout(() => {
+    clear_posts()
+    setInterval(clear_posts, 1000 * 60 * 60 * 24)
+}, mil_to_12)
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

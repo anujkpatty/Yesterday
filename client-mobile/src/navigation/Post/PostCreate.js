@@ -6,6 +6,8 @@ import * as SecureStore from 'expo-secure-store';
 
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import Axios from 'axios';
+import { StackActions } from '@react-navigation/native';
+
 
 const SERVER_URL = 'http://localhost:3001';
 
@@ -77,6 +79,8 @@ const PostCreate = ({navigation}) => {
       }
 
       await Axios.get(`http://localhost:3001/make_gif?postid=${postid}`)
+
+      navigation.dispatch(StackActions.popToTop())
 
     } else {
       alert('Post must contain at least 2 images')

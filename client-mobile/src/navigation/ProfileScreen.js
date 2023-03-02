@@ -12,7 +12,7 @@ export default function ProfileScreen({ navigation, route }) {
 
     async function getRelation() {
         const curUser = await SecureStore.getItemAsync('userToken') 
-        if (curUser == route.user) {
+        if (curUser == route.params.user) {
             setRelation(4)
         } else {
             Axios.get(`http://localhost:3001/relation?user_1=${curUser}&user_2=${route.params.user}`)

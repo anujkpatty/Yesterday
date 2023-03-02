@@ -1,9 +1,10 @@
 import * as React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import Axios from "axios";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Alert, Text, View } from 'react-native';
-import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { NavigationContainer, StackActions, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from './src/AuthContext';
@@ -14,6 +15,9 @@ import LoginScreen from './src/navigation/LoginScreen';
 import RegisterScreen from './src/navigation/RegisterScreen';
 import SettingsScreen from './src/navigation/SettingsScreen';
 import PostRoot from './src/navigation/PostRoot';
+import ProfileScreen from './src/navigation/ProfileScreen';
+import ProfileRoot from './src/navigation/ProfileRoot';
+import FeedRoot from './src/navigation/FeedRoot';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -112,9 +116,17 @@ export default function App() {
     []
   );
 
+  const MyTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: 'white',
+    },
+  };
+
   return (
     <AuthContext.Provider value={authContext}>
-      <NavigationContainer>
+      <NavigationContainer theme={MyTheme}>
         {state.userToken == null ? (
           <Stack.Navigator>
             <Stack.Screen name="Start" options={{ headerShown: false }} component={StartScreen} />
@@ -122,10 +134,44 @@ export default function App() {
             <Stack.Screen name="Register" component={RegisterScreen} />
           </Stack.Navigator>
         ) :(
-          <Tab.Navigator>
-            <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Upload" options={{ headerShown: false }} component={PostRoot} />
-            <Tab.Screen name="Settings" component={SettingsScreen} />
+          <Tab.Navigator 
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconName;
+    
+                if (route.name === 'Home') {
+                  iconName = focused
+                    ? 'ios-home'
+                    : 'ios-home-outline';
+                } else if (route.name === 'Upload') {
+                  iconName = focused ? 'ios-add-circle' : 'ios-add';
+                } else if (route.name === 'Profile') {
+                  iconName = focused ? 'ios-person' : 'ios-person-outline';
+                }
+    
+                // You can return any component that you like here!
+                return <Ionicons name={iconName} size={size} color={color} />;
+              },
+              tabBarActiveTintColor: 'black',
+              tabBarInactiveTintColor: 'black',
+            })}
+          >
+            <Tab.Screen 
+              name="Home" 
+              options={{ headerShown: false }}
+              component={FeedRoot} 
+              
+            />
+            <Tab.Screen 
+              name="Upload" 
+              options={{ headerShown: false }} 
+              component={PostRoot} />
+            <Tab.Screen 
+              name="Profile" 
+              initialParams={{ user: state.userToken}}
+              options={{ headerShown: false }}
+              component={ProfileRoot} 
+            />
           </Tab.Navigator>
         )}
         

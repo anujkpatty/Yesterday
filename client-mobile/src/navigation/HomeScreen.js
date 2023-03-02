@@ -32,13 +32,12 @@ function HomeScreen({navigation}) {
 
     const Item = ({name}) => (
       <>
-        <Image key={name} source={{uri: `http://localhost:3001/gif?user=${name}`}} alt="" style = {styles.image} />
+        <Image key={name} source={{uri: `http://localhost:3001/gif?user=${name}&status=1`}} alt="" style = {styles.image} />
         <Text style={styles.text}>{name}</Text>
       </>
     );
 
     useEffect(() => {
-      console.log("mount")
       getPosts()
     }, [])
 
