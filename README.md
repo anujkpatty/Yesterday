@@ -4,7 +4,7 @@ Yesterday is a mobile social media app built using React-Native and a Node.js an
 
 ## Installation
 
-Clone the repo and install all dependencies.  Use ```npm start```in server to run the backend. Then, use ```npx expo start``` to run the client in client-mobile.
+Clone the repo and install all dependencies.  Use ```npm start``` in server to run the backend. Then, use ```npx expo start``` to run the client in client-mobile.
 
 ## Media format
 
