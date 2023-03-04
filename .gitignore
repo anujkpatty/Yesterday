@@ -45,6 +45,7 @@ jspm_packages/
 server/images/
 server/gifs/
 server/userdb.sqlite
+server/profile-pictures
 
 # TypeScript v1 declaration files
 typings/
