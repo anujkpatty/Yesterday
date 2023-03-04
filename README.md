@@ -8,5 +8,5 @@ Clone the repo and install all dependencies.  Use 'npm start' in server to run t
 
 ## Media format
 
-<img src="https://github.com/anujkpatty/yesterday/blob/main/13.gif" height="250"/>
+<img src="https://github.com/anujkpatty/yesterday/blob/main/sample.gif" height="250"/>
 
