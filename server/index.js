@@ -42,7 +42,8 @@ var db = new sqlite3.Database(DBSOURCE, (err) => {
         db.run(`CREATE TABLE Users (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             Username TEXT UNIQUE,
-            Password TEXT
+            Password TEXT,
+            Path TEXT
             )`, (err) => {
                 if (err) {
                     //do nothing
@@ -88,7 +89,18 @@ const storage = multer.diskStorage({
     },
   });
 
+const profile_storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'profile-pictures');
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + file.originalname.match(/\..*$/)[0]);
+    },
+});
+
 const upload = multer({ storage: storage, limits: { fieldSize: 25 * 1024 * 1024 }});
+
+const profile_upload = multer({ storage: profile_storage, limits: { fieldSize: 25 * 1024 * 1024 }});
 
 
 app.post('/upload', upload.array('images'), function (req, res, next) {
@@ -107,6 +119,17 @@ app.post('/upload_single', upload.single('image'), function (req, res, next) {
     
     res.status(200).end('Your file uploaded.');
 })
+
+app.post('/profile_picture', profile_upload.single('image'), function (req, res, next) {
+
+    const user = req.query.user
+    var insert = 'UPDATE Users SET Path = ? WHERE Username = ?'
+
+    db.run(insert, [req.file.path, user])
+    
+    res.status(200).end('Your file uploaded.');
+})
+
 
 app.post('/login', (req, res) => {
     const username = req.body.username
@@ -131,7 +154,7 @@ app.post('/register', (req, res) => {
     const password = req.body.password
 
     if (username && password) {
-        const sql = `INSERT INTO Users (Username, Password) VALUES (?, ?)`
+        const sql = `INSERT INTO Users (Username, Password, Path) VALUES (?, ?, './profile-pictures/default-user.png')`
 
         db.run(sql, [username, password], (err) => {
             if (err) {
@@ -263,6 +286,33 @@ app.get('/gif', (req, res) => {
     }
 }) 
 
+app.get('/profile_picture', (req, res) => {
+    const user = req.query.user
+    const sql = 'SELECT Path path FROM Users WHERE Username = ?'
+
+    if (!user) {
+        res.sendStatus(404)
+    } else {
+        db.get(sql, [user], (err, row) => {
+            if (err) {
+                console.log(err)
+            } else if (!row) {
+                res.sendStatus(404)
+            } else {
+                let path = row.path
+                fs.readFile(path, function(err, data) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        res.set('Content-Type', 'image/gif')
+                        res.send(data)
+                    }
+                })
+            }
+        })
+    }
+})
+
 app.post('/add_friend', (req, res) => {
     const user_one = req.body.user_one
     const user_two = req.body.user_two
@@ -391,7 +441,7 @@ app.put('/accept', (req, res) => {
 app.get('/feed', (req, res) => {
     const user = req.query.user
 
-    const sql = 'SELECT * FROM Posts WHERE Status = 1 AND User IN (SELECT User_two FROM Friends WHERE User_one = ?)'
+    const sql = 'SELECT * FROM Posts WHERE Status = 1 AND User IN (SELECT User_two FROM Friends WHERE User_one = ? AND Status = 2)'
 
     db.all(sql, [user], (err, rows) => {
         if (err) {
@@ -448,7 +498,7 @@ function clear_posts() {
 }
 
 var now = new Date();
-var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 1, 0, 0) - now;
+var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 53, 0, 0) - now;
 if (mil_to_12 < 0) {
      mil_to_12 += 86400000; // it's after 10am, try 10am tomorrow.
 }

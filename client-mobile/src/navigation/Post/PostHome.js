@@ -12,6 +12,7 @@ export default function PostHome({ navigation }) {
 
     const [today, setToday] = useState(null)
     const [yesterday, setYesterday] = useState(null)
+    const [option, setOption] = useState('today')
     const isFocused = useIsFocused();
 
 
@@ -36,29 +37,40 @@ export default function PostHome({ navigation }) {
         isFocused && getPosts()
     }, [isFocused])
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
+    const renderPosts = () => {
+        if (option == 'today') {
+            if (today) {
+                return <Image key={Date.now() + 1} source={{uri: today}} alt="" style = {styles.image} />
+            } else {
+                return <Text style={styles.text}>No post</Text>
+            }
+        } else if (option == 'yesterday') {
+            if (yesterday) {
+                return <Image key={Date.now() + 1} source={{uri: yesterday}} alt="" style = {styles.image} />
+            } else {
+                return <Text style={styles.text}>No post</Text>
+            }
+        } 
+        return <></>
+    }
 
-            <View style={styles.title_container}>
-                <Text style={styles.title}>Today</Text>
+    return (
+        <View style={styles.container}>
+
+            <View style={styles.post_container}>
+                {renderPosts()}
             </View>
-               
-            {today ? 
-                <Image key={Date.now()} source={{uri: today}} alt="" style = {styles.image} /> 
-                : (
-                    <Pressable onPress={() => navigation.navigate('PostCreate')} >
-                        <Text style={styles.text}>New Post</Text>
-                    </Pressable>)
-            }
-            <View style={styles.title_container}>
-                <Text style={styles.title}>Yesterday</Text>
+            
+            <View style={styles.button_container}>
+                <Pressable style={() => option == 'today' ? styles.button_pressed : styles.button} key={'today'} onPress={() => setOption('today')}>
+                    <Text style={styles.text}>Today</Text>
+                </Pressable>
+                <Pressable style={() => option == 'yesterday' ? styles.button_pressed : styles.button} key={'yesterday'} onPress={() => setOption('yesterday')}>
+                    <Text style={styles.text}>Yesterday</Text>
+                </Pressable>
             </View>
-            {yesterday ? 
-                <Image key={Date.now() + 1} source={{uri: yesterday}} alt="" style = {styles.image} /> 
-                : <Text style={styles.text}>No post</Text>
-                    
-            }
-        </ScrollView>
+            
+        </View>
         
     )
 }
@@ -66,38 +78,52 @@ export default function PostHome({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
+        justifyContent: 'flex-end',
         alignItems: 'center',
+        height: '100%',
+
     },
     button: {
-        height: 50,
-        width: 50,
-        margin: 10,
-        borderWidth: 2,
+        width: '50%',
+        justifyContent: 'center',
+        height: '100%',
+        borderTopWidth: 2,
+        borderColor: 'lightgray',
+    },
+    button_pressed: {
+        width: '50%',
+        justifyContent: 'center',
+        height: '100%',
+        borderTopWidth: 2,
+        borderColor: 'black',
     },
     text: {
         fontSize: 16,
-        color: 'gray',
-        alignSelf: 'flex-start',
-        marginLeft: 15
+        color: 'black',
+        alignSelf: 'center'
         
-    },
-    title: {
-        fontSize: 24,
-        marginTop: 10,
-        alignSelf: 'flex-start',
-
-    },
-    title_container: {
-        height: 40,
-        width: 360,
-        borderBottomWidth: 1,
-        marginBottom: 10,
-        padding: 0,
     },
     image: {
         height: 480,
         width: 360,
+        alignSelf: 'center'
 
+    }, 
+    button_container: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        height: '8%',
+        width: '100%'
+ 
+    },
+    post_container: {
+        height: 480,
+        justifyContent: 'center',
+        marginBottom: '24%',
+        width: '100%'
+
+ 
     }
 
 

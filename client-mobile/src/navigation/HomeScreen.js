@@ -9,12 +9,21 @@ import {
   StyleSheet,
   Text,
   StatusBar,
-  Image
+  Image,
+  RefreshControl,
 } from 'react-native';
 
 function HomeScreen({navigation}) {
 
     const [users, setUsers] = useState(null)
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = React.useCallback(() => {
+      setRefreshing(true);
+      getPosts();
+      setRefreshing(false)
+      
+  }, []);
 
     const getPosts = async () => {
       const curUser = await SecureStore.getItemAsync('userToken')
@@ -47,12 +56,11 @@ function HomeScreen({navigation}) {
           data={users}
           renderItem={({item}) => <Item name={item} />}
           keyExtractor={item => item}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
       </SafeAreaView>
   )
-}
-
-export default HomeScreen;
+} export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

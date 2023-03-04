@@ -6,12 +6,10 @@ import { Pressable, Text } from "react-native";
 import HomeScreen from "./HomeScreen";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
-
-
-
+import ProfileScreen from "./ProfileScreen";
+import * as SecureStore from 'expo-secure-store';
 
 const Stack = createNativeStackNavigator();
-
 
 export default function FeedRoot() {
     return(
@@ -29,7 +27,20 @@ export default function FeedRoot() {
                     ),
             })}
             />
-            <Stack.Screen name="Search" component={SearchScreen}/>
+            <Stack.Screen 
+                name="Search" 
+                component={SearchScreen}
+                options={() => ({
+                    title: '',
+                })}
+                />
+            <Stack.Screen 
+                name="Profile" 
+                component={ProfileScreen}
+                options={({ route, navigation }) => ({
+                    title: '',
+                })}
+                />
         </Stack.Navigator>
     )
 }

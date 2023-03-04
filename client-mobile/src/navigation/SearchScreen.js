@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 
-import { Text, View, Image, TextInput, Button } from 'react-native';
+import { Text, View, Image, TextInput, Button, ScrollView, Pressable, StyleSheet } from 'react-native';
 import Axios from 'axios';
 
 export default function SearchScreen({navigation}) {
@@ -17,26 +17,62 @@ export default function SearchScreen({navigation}) {
         .catch(err => console.log(err))
     }
 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerSearchBarOptions: {
+            onChangeText: (event) => {
+                getUsers(event.nativeEvent.text)
+            },
+            hideWhenScrolling: false,
+            
+            
+            },
+        });
+    }, [navigation]);
+
+    const Result = (props) => {
+        return(
+            <Pressable onPress={() => navigation.push('Profile', {user: props.user})}>
+                <View style={styles.result}>
+                    <Image source={{uri: `http://localhost:3001/profile_picture?user=${props.user}`}} alt="" style = {styles.profile} />
+                    <Text style={styles.username}>{props.user}</Text>
+                </View>
+            </Pressable> 
+            
+        )
+    }
+
     const renderUsers = (names) => {
-        return names.map(name => <Text key={name} onPress={() => navigation.push('ProfileScreen', {user: name})}>{name}</Text>)
+        return names.map(name => <Result key={name} user={name}/>)
             
     }
 
     return (
-        <View>
-            <TextInput
-                placeholder="Search"
-                value={search}
-                onChangeText={(text) => {
-                    setSearch(text);
-                    getUsers(text);
-                }}
-            />
+        <ScrollView contentInsetAdjustmentBehavior="automatic">
+            
             <View>
                 {renderUsers(users)}
             </View>
             
-        </View>
+        </ScrollView>
     )
 
 }
+
+const styles = StyleSheet.create({
+    result: {
+        height: 70,
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    profile: {
+        height: 50,
+        width: 50,
+        margin: 5,
+        borderRadius: 25,
+    },
+    username: {
+        fontSize: 16,
+        margin: 5,
+    },
+})

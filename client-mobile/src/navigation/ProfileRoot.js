@@ -26,7 +26,7 @@ export default  function ProfileRoot({navigation, route}) {
               component={ProfileScreen} 
               initialParams={{ user: route.params.user }}
               options={({ route, navigation }) => ({
-                title: route.params.user,
+                title: '',
                 headerRight: () => (
                     <Pressable onPress={() => navigation.navigate('Requests')}>
                         <Ionicons name={'notifications-outline'} size={24} color={'black'}/>
@@ -41,6 +41,11 @@ export default  function ProfileRoot({navigation, route}) {
             />
             <Stack.Screen name="Requests" component={RequestsScreen}/>
             <Stack.Screen name="Settings" component={SettingsScreen}/>
+            <Stack.Screen 
+              name="Profile2" 
+              component={ProfileScreen} 
+              options={() => ({title: ''})}
+            />
         </Stack.Navigator>
     )
 }
