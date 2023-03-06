@@ -47,6 +47,9 @@ server/gifs/
 server/userdb.sqlite
 server/profile-pictures
 
+#Expo
+.expo
+
 # TypeScript v1 declaration files
 typings/
 
