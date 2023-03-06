@@ -1171,6 +1171,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@dominicstop/ts-event-emitter@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@dominicstop/ts-event-emitter/-/ts-event-emitter-1.1.0.tgz#1f3d3fa878a1ccab686931280757954719cf88e4"
+  integrity sha512-CcxmJIvUb1vsFheuGGVSQf4KdPZC44XolpUT34+vlal+LyQoBUOn31pjFET5M9ctOxEpt8xa0M3/2M7uUiAoJw==
+
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
@@ -5524,7 +5529,7 @@ prompts@^2.3.2, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@*, prop-types@^15.7.2:
+prop-types@^15.7.2:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -5660,17 +5665,12 @@ react-native-image-picker@^4.10.2:
   resolved "https://registry.npmjs.org/react-native-image-picker/-/react-native-image-picker-4.10.2.tgz"
   integrity sha512-3h9PrA1dQ84rVeipzQE4eWTELvflSHNtJZN6rz7NkZyaxo9YZV8H/TswBpHwiS5YWlyu+zlLzSoWVa1opSu7GA==
 
-react-native-login-screen@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-login-screen/-/react-native-login-screen-4.2.0.tgz#8054a411b893dcba1673113f7acf50b81aca1f0b"
-  integrity sha512-IS/uc+47FhGNrQynsTMykp3q/RRsbLbua7zjYnqnwk1qH+r655D8BSWvyikZ/o851fLGW7fKU7FIZCF1eV6B3A==
-
-react-native-profile-picture@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-profile-picture/-/react-native-profile-picture-1.0.0.tgz#1f0686589ef5557e79eba555372af254980a5fa0"
-  integrity sha512-T8q41LSr1c9dlWFsV5XVkyc5tFe6zh5U8FVPX1Om6lFHAre18UlvikYz3GHX2UGUvCdUZPjoxcujSQ9RK+QkGA==
+react-native-ios-context-menu@^1.15.3:
+  version "1.15.3"
+  resolved "https://registry.yarnpkg.com/react-native-ios-context-menu/-/react-native-ios-context-menu-1.15.3.tgz#c02e6a7af2df8c08d0b3e1c8f3395484b3c9c760"
+  integrity sha512-UNkVl7ocvSpNaEpvBvE1aHOfDy/DFdZ5I+ElfnTXFsRxrVZmxLtST0b1q2wSWGWDmd2Ig2AYd7GRbYtcY222Ag==
   dependencies:
-    prop-types "*"
+    "@dominicstop/ts-event-emitter" "^1.1.0"
 
 react-native-reanimated@~2.12.0:
   version "2.12.0"
@@ -5697,6 +5697,11 @@ react-native-screens@^3.18.2:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-size-matters@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-size-matters/-/react-native-size-matters-0.4.0.tgz#01bfd0d59454318f4e0b13fe9c1eb0523d70f2e0"
+  integrity sha512-8/C0htHrFWeUm9N8JegmadovUfgTWkGBkDPZ1N3YkXtDWb+98Ya2gThiKcu445r8c7YhcrBfnHz/mYsXIusaOQ==
 
 react-native-text-input-interactive@^0.1.4:
   version "0.1.4"

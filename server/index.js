@@ -354,6 +354,20 @@ app.put('/remove_friend', (req, res) => {
     res.sendStatus(200)
 })
 
+app.put('/post', (req, res) => {
+    const status = req.body.status
+    const user = req.body.user
+    const sql = `DELETE FROM Posts WHERE User = ? AND Status = ?`
+
+    db.run(sql, [user, status], (err) => {
+        if (err) {
+            console.log(err)
+        } else {
+            res.sendStatus(200)
+        }
+    })
+})
+
 app.get('/relation', (req, res) => {
     const user_1 = req.query.user_1
     const user_2 = req.query.user_2

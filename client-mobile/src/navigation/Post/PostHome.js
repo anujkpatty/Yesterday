@@ -3,7 +3,9 @@ import { Pressable, StyleSheet, TextInput, View, Button, Text, Image, ScrollView
 import * as SecureStore from 'expo-secure-store';
 import Axios from 'axios';
 import { useIsFocused } from "@react-navigation/native";
-
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { ContextMenuView } from 'react-native-ios-context-menu';
+import { Alert } from "react-native";
 
 
 
@@ -37,16 +39,79 @@ export default function PostHome({ navigation }) {
         isFocused && getPosts()
     }, [isFocused])
 
+    async function deletePost(key) {
+        var status
+        let user = await SecureStore.getItemAsync('userToken')
+        if (key == 'today') {
+            status = 0
+        } else {
+            status = 1
+        } 
+
+        console.log(user , status)
+
+        Axios.put('http://localhost:3001/post', {user: user, status: status})
+        .then((res) => getPosts())
+        .catch(err => console.log(err))
+
+
+    }
+
     const renderPosts = () => {
         if (option == 'today') {
             if (today) {
-                return <Image key={Date.now() + 1} source={{uri: today}} alt="" style = {styles.image} />
+                return (
+                        <ContextMenuView 
+                            key={'today_context'}
+                            style={styles.image_cont}
+                            menuConfig={{
+                                menuTitle: 'Post Options',
+                                menuItems: [{
+                                  actionKey  : 'today',
+                                  actionTitle: 'Delete post',
+                                }, ],
+                            }}
+                            onPressMenuItem={({nativeEvent}) => {
+                                Alert.alert('Delete Post?', '', [
+                                    {
+                                      text: 'Cancel',
+                                      style: 'cancel',
+                                    },
+                                    {text: 'OK', onPress: () => deletePost(nativeEvent.actionKey)},
+                                ]);
+                            }}
+                        >
+                            {/* <Ionicons name="ellipsis-horizontal-outline" size={24} color="black" /> */}
+                            <Image key={Date.now() + 1} source={{uri: today}} alt="" style = {styles.image} />
+                        </ContextMenuView>)
             } else {
                 return <Text style={styles.text}>No post</Text>
             }
         } else if (option == 'yesterday') {
             if (yesterday) {
-                return <Image key={Date.now() + 1} source={{uri: yesterday}} alt="" style = {styles.image} />
+                return (<ContextMenuView 
+                            key={'yesterday-context'}
+                            style={styles.image_cont}
+                            menuConfig={{
+                                menuTitle: 'Post Options',
+                                menuItems: [{
+                                  actionKey  : 'yesterday',
+                                  actionTitle: 'Delete post',
+                                }, ],
+                            }}
+                            onPressMenuItem={({nativeEvent}) => {
+                                Alert.alert('Delete Post?', '', [
+                                    {
+                                      text: 'Cancel',
+                                      style: 'cancel',
+                                    },
+                                    {text: 'OK', onPress: () => deletePost(nativeEvent.actionKey)},
+                                ]);
+                            }}
+                        >
+                            {/* <Ionicons name="ellipsis-horizontal-outline" size={24} color="black" /> */}
+                            <Image key={Date.now() + 1} source={{uri: yesterday}} alt="" style = {styles.image} />
+                        </ContextMenuView>)
             } else {
                 return <Text style={styles.text}>No post</Text>
             }
@@ -60,6 +125,8 @@ export default function PostHome({ navigation }) {
             <View style={styles.post_container}>
                 {renderPosts()}
             </View>
+
+            
             
             <View style={styles.button_container}>
                 <Pressable style={() => option == 'today' ? styles.button_pressed : styles.button} key={'today'} onPress={() => setOption('today')}>
@@ -109,21 +176,29 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
 
     }, 
+    image_cont: {
+        height: 480,
+        width: 360,
+    }, 
     button_container: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
         height: '8%',
-        width: '100%'
+        width: '100%',
  
     },
     post_container: {
         height: 480,
         justifyContent: 'center',
+        alignItems: 'center',
         marginBottom: '24%',
-        width: '100%'
-
- 
+        width: '100%',
+    },
+    options: {
+        left: '90%',
+        top: '100%',
+        position: 'absolute',
     }
 
 
