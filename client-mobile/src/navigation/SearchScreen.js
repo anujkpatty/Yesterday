@@ -20,10 +20,11 @@ export default function SearchScreen({navigation}) {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerSearchBarOptions: {
-            onChangeText: (event) => {
-                getUsers(event.nativeEvent.text)
-            },
-            hideWhenScrolling: false,
+                onChangeText: (event) => {
+                    getUsers(event.nativeEvent.text)
+                },
+                hideWhenScrolling: false,
+                autoCapitalize: false
             
             
             },

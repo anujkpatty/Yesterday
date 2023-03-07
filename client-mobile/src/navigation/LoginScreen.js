@@ -26,6 +26,7 @@ function LoginScreen({ navigation }) {
                 placeholder="Username"
                 value={username}
                 onChangeText={setUsername}
+                autoCapitalize='none'
             />
             <TextInput
                 style={styles.input}

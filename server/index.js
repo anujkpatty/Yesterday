@@ -124,6 +124,24 @@ app.post('/upload_single', upload.single('image'), function (req, res, next) {
 app.post('/profile_picture', profile_upload.single('image'), function (req, res, next) {
 
     const user = req.query.user
+    const sql = 'SELECT Path FROM Users WHERE Username = ?'
+
+    db.get(sql, [user], (err, row) => {
+        if (err) {
+            console.log(err)
+        } else {
+            if (row.Path != './profile-pictures/default-user.png') {
+                fs.unlink(row.Path, (err) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        console.log('file deleted')
+                    }
+                })
+            }
+        }
+    })
+
     var insert = 'UPDATE Users SET Path = ? WHERE Username = ?'
 
     db.run(insert, [req.file.path, user])
@@ -171,44 +189,73 @@ app.post('/register', (req, res) => {
     
 })
 
+function deletePostAndFiles(user, status, date) {
+
+    let sql = 'SELECT * FROM Posts WHERE User = ? AND Status = ?'
+
+    db.get(sql, [user, status], (err, row) => {
+        if (err) {
+            console.log(err)
+        } else {
+            if (row) {
+
+                let imgs_sql = 'SELECT * FROM Images WHERE Post = ?'
+                db.all(imgs_sql, [row.Id], (err, rows) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        rows.forEach(row => {
+                            fs.unlink(row.Path, (err) => {
+                                if (err) console.log(err)
+                            })
+                        })
+                        db.run('DELETE FROM Images WHERE Post = ?', [row.Id], (err) => {
+                            if (err) {
+                                console.log(err)
+                            }
+                        })
+                    }
+                    
+                })
+
+                fs.unlink(row.Path, (err) => {
+                    if (err) console.log(err)
+                })
+
+                sql = 'DELETE FROM Posts WHERE Id = ?'
+                db.run(sql, [row.Id], (err) => {
+                    if (err) {
+                        console.log(err)
+                    } 
+                })
+            }
+        }
+    })
+}
+
 app.post('/create_post', (req, res) => {
     const user = req.body.user
 
     let date = new Date();
     date = date.toISOString().split('T')[0];
 
-    let sql = 'SELECT Id id FROM Posts WHERE User = ? AND Status = 0'
+    deletePostAndFiles(user, 0, '')
 
-    db.get(sql, [user], (err, row) => {
+    
+    sql = 'INSERT INTO Posts (User, Status, Date) VALUES (?, 0, ?)'
+    db.run(sql, [user, date], (err) => {
         if (err) {
             console.log(err)
         } else {
-            if (row) {
-                sql = 'DELETE FROM Posts WHERE Id = ?'
-                db.run(sql, [row.id], (err) => {
-                    if (err) {
-                        console.log(err)
-                    } 
-                })
-            }
-            sql = 'INSERT INTO Posts (User, Status, Date) VALUES (?, 0, ?)'
-            db.run(sql, [user, date], (err) => {
+            db.get('SELECT Id id FROM Posts WHERE User = ? AND Status = 0', [user], (err, row2) => {
                 if (err) {
                     console.log(err)
                 } else {
-                    db.get('SELECT Id id FROM Posts WHERE User = ? AND Status = 0', [user], (err, row2) => {
-                        if (err) {
-                            console.log(err)
-                        } else {
-                            res.json({postid: row2.id})
-                        }
-                    })
+                    res.json({postid: row2.id})
                 }
             })
-            
         }
     })
-
 })
 
 
@@ -228,9 +275,6 @@ app.get('/:id/image', (req, res) => {
             });
         }
     })
-
-        // res.set('Content-Type', 'image/png')
-        // res.send(img)
 })
 
 app.get('/make_gif', (req, res) => {
@@ -266,7 +310,7 @@ app.get('/gif', (req, res) => {
     const status = req.query.status
     const sql = 'SELECT Path path FROM Posts WHERE User = ? AND Status = ?'
 
-    if (!user) {
+    if (!user || !status) {
         res.sendStatus(404)
     } else {
         db.get(sql, [user, status], (err, row) => {
@@ -382,15 +426,7 @@ app.put('/remove_friend', (req, res) => {
 app.put('/post', (req, res) => {
     const status = req.body.status
     const user = req.body.user
-    const sql = `DELETE FROM Posts WHERE User = ? AND Status = ?`
-
-    db.run(sql, [user, status], (err) => {
-        if (err) {
-            console.log(err)
-        } else {
-            res.sendStatus(200)
-        }
-    })
+    deletePostAndFiles(user, status, '')
 })
 
 app.get('/relation', (req, res) => {

@@ -61,6 +61,7 @@ export default function ProfileScreen({ navigation, route }) {
               httpMethod: 'POST',
               uploadType: FileSystem.FileSystemUploadType.MULTIPART,
             });
+            getProfile()
             
           } catch (error) {
             console.log(error);

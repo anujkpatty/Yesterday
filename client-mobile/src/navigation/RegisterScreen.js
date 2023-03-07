@@ -30,6 +30,7 @@ function RegisterScreen({ navigation }) {
                 value={username}
                 onChangeText={setUsername}
                 style={styles.input}
+                autoCapitalize='none'
             />
             <TextInput
                 placeholder="Password"

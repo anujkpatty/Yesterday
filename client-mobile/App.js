@@ -82,14 +82,16 @@ export default function App() {
         // After getting token, we need to persist the token using `SecureStore`
         // In the example, we'll use a dummy token
 
-        const { username, password } = data
+        let { username, password } = data
+
+        username = username.toLowerCase();
 
         Axios.post("http://localhost:3001/login", { username: username, password: password })
         .then(res => {
           SecureStore.setItemAsync('userToken', res.data.user)
           dispatch({ type: 'SIGN_IN', token: res.data.user});
         })
-        .catch(err => alert('Invalid username or password'));
+        .catch(err => Alert.alert('Error', 'Invalid username or password'));
 
         
       },
@@ -102,7 +104,24 @@ export default function App() {
         // We will also need to handle errors if sign up failed
         // After getting token, we need to persist the token using `SecureStore`
         // In the example, we'll use a dummy token
-        const { username, password } = data
+
+        let { username, password } = data
+
+        username = username.toLowerCase();
+
+        if (!username) {
+          Alert.alert('Error', 'Please enter a username')
+          return
+        } else if (username.length < 2) {
+          Alert.alert('Error', 'Username must be at least 2 characters')
+          return
+        } else if (username.length > 12) {
+          Alert.alert('Error', 'Username must be less than 13 characters')
+          return
+        } else if (password.length < 8) {
+          Alert.alert('Error', 'Password must be at least 8 characters')
+          return
+        }
 
         Axios.post("http://localhost:3001/register", { username: username, password: password })
         .then(res => {
@@ -121,6 +140,7 @@ export default function App() {
     colors: {
       ...DefaultTheme.colors,
       background: 'white',
+      primary: 'black'
     },
   };
 
@@ -129,9 +149,30 @@ export default function App() {
       <NavigationContainer theme={MyTheme}>
         {state.userToken == null ? (
           <Stack.Navigator>
-            <Stack.Screen name="Start" options={{ headerShown: false }} component={StartScreen} />
-            <Stack.Screen name="LogIn" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen 
+              name="Start" 
+              options={{ headerShown: false }} 
+              component={StartScreen} 
+            />
+            <Stack.Screen 
+              name="LogIn" 
+              component={LoginScreen} 
+              options={{
+                title: 'Login',
+                headerBackTitleVisible: false,
+                headerShadowVisible: false,
+
+              }}
+            />
+            <Stack.Screen 
+              name="Register" 
+              component={RegisterScreen} 
+              options={{
+                headerBackTitleVisible: false,
+                headerShadowVisible: false,
+              }}
+              
+            />
           </Stack.Navigator>
         ) :(
           <Tab.Navigator 

@@ -54,6 +54,8 @@ export default function PostHome({ navigation }) {
         .then((res) => getPosts())
         .catch(err => console.log(err))
 
+        getPosts()
+
 
     }
 
