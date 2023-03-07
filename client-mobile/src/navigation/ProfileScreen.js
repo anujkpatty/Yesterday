@@ -5,6 +5,7 @@ import * as FileSystem from 'expo-file-system';
 
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { StackActions } from '@react-navigation/native';
+import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 
 
 
@@ -23,11 +24,11 @@ import {
 import Axios from 'axios';
 
 export default function ProfileScreen({ navigation, route }) {
-    const [loaded, setLoaded] = useState(false)
     //relation state 0 == requested, 1 == request pending, 2 == accepted, 3 == not friends, 4 == same user
     const [relation, setRelation] = useState(null)
     const [profilePic, setProfilePic] = useState(null)
     const [refreshing, setRefreshing] = React.useState(false);
+    const [posts, setPosts] = React.useState([])
 
 
     const onRefresh = React.useCallback(() => {
@@ -60,7 +61,6 @@ export default function ProfileScreen({ navigation, route }) {
               httpMethod: 'POST',
               uploadType: FileSystem.FileSystemUploadType.MULTIPART,
             });
-            setLoaded(false)
             
           } catch (error) {
             console.log(error);
@@ -68,7 +68,17 @@ export default function ProfileScreen({ navigation, route }) {
         }
       };
 
-    async function getProfile() {
+    function getProfile() {
+        Axios.get(`http://localhost:3001/${route.params.user}/posts`)
+        .then(res => {
+            setPosts(res.data)
+        })
+        .catch(err => console.log(err))       
+
+        setProfilePic(`http://localhost:3001/profile_picture?user=${route.params.user}&hash=${Date.now()}`)
+    }
+
+    async function getRelation() {
         const curUser = await SecureStore.getItemAsync('userToken') 
         if (curUser == route.params.user) {
             setRelation(4)
@@ -79,22 +89,20 @@ export default function ProfileScreen({ navigation, route }) {
             })
             .catch(err => console.log(err))
         }
-        setProfilePic(`http://localhost:3001/profile_picture?user=${route.params.user}&hash=${Date.now()}`)
-        
     }
 
-    async function load() {
-        await getProfile();
+    useEffect(() => {
+        getProfile()
+        getRelation()
+    }, [])
 
-        setLoaded(true);
-    }
 
     async function addFriend() {
         Axios.post('http://localhost:3001/add_friend', {
             user_one: await SecureStore.getItemAsync('userToken'), 
             user_two: route.params.user,
         })
-        .then(() => setLoaded(false))
+        .then(() => getRelation())
     }
 
     async function removeFriend() {
@@ -102,7 +110,7 @@ export default function ProfileScreen({ navigation, route }) {
             user_one: await SecureStore.getItemAsync('userToken'), 
             user_two: route.params.user,
         })
-        .then(() => setLoaded(false))
+        .then(() => getRelation())
     }
 
     async function acceptFriend() {
@@ -110,34 +118,85 @@ export default function ProfileScreen({ navigation, route }) {
             user_two: await SecureStore.getItemAsync('userToken'), 
             user_one: route.params.user,
         })
-        .then(() => setLoaded(false))
+        .then(() => getRelation())
     }
-    useEffect(() => {
-        load();
-    }, [loaded])
 
-    const render = () => {
-        if (loaded) {
-            if (relation == 2 || relation == 0) {
-                return(
-                    <Pressable style={styles.request} onPress={removeFriend}>
-                        <Text style={styles.request_text}>Remove</Text>
+
+    const render_button = () => {
+        if (relation == 2 || relation == 0) {
+            return(
+                <Pressable key={relation} style={styles.request} onPress={removeFriend}>
+                    <Text style={styles.request_text}>Remove</Text>
+                </Pressable>)
+        } else if (relation == 3) {
+            return(
+                    <Pressable key={relation} style={styles.request} onPress={addFriend}>
+                        <Text style={styles.request_text}>Add</Text>
                     </Pressable>)
-            } else if (relation == 3) {
-                return(
-                        <Pressable style={styles.request} onPress={addFriend}>
-                            <Text style={styles.request_text}>Add</Text>
-                        </Pressable>)
-            } else if (relation == 1) {
-                return(
-                        <Pressable style={styles.request} onPress={acceptFriend}>
-                            <Text style={styles.request_text}>Add</Text>
-                        </Pressable>)
-            }
+        } else if (relation == 1) {
+            return(
+                    <Pressable key={relation} style={styles.request} onPress={acceptFriend}>
+                        <Text style={styles.request_text}>Add</Text>
+                    </Pressable>)
         } else {
-            return((<Text>Loading</Text>))
+            return <View style={styles.spacer}/>
         }
+    }
+
+    function view_post(date) {
+        posts.forEach(post => {
+            if (post.date == date) {
+                navigation.push('View', {id: post.id})
+            }
+        })
         
+    }
+
+    function posts_calender() {
+
+        let marked_dates = {}
+
+        posts.forEach((post) => {
+            marked_dates[post.date] = {marked: true, disableTouchEvent: false}
+        })
+
+
+        return(
+            <Calendar
+                markedDates={marked_dates}
+                disabledByDefault={true}
+                enableSwipeMonths={true}
+                hideExtraDays={true}
+                onDayPress={day => {
+                    view_post(day.dateString)
+                }}
+                disableAllTouchEventsForDisabledDays={true}
+                style={styles.calendar}
+                theme={{
+                    backgroundColor: '#ffffff',
+                    calendarBackground: '#ffffff',
+                    textSectionTitleColor: '#000000',
+                    textSectionTitleDisabledColor: '#000000',
+                    selectedDayBackgroundColor: '#000000',
+                    selectedDayTextColor: '#ffffff',
+                    todayTextColor: '#000000',
+                    dayTextColor: '#000000',
+                    textDisabledColor: '#000000',
+                    dotColor: '#000000',
+                    selectedDotColor: '#000000',
+                    arrowColor: 'black',
+                    disabledArrowColor: 'black',
+                    monthTextColor: 'black',
+                    indicatorColor: 'black',
+                    textDayFontWeight: '100',
+                    textMonthFontWeight: 'normal',
+                    textDayHeaderFontWeight: '100',
+                    textDayFontSize: 20,
+                    textMonthFontSize: 16,
+                    textDayHeaderFontSize: 12
+                }}
+            />
+        )
     }
 
     return (
@@ -157,7 +216,8 @@ export default function ProfileScreen({ navigation, route }) {
                     }
                     <Text style={styles.profile_name}>{route.params.user}</Text>
                     
-                    {render()}
+                    {render_button()}
+                    {posts_calender()}
                 </ScrollView>
             </SafeAreaView>
             
@@ -178,7 +238,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     container: {
-        
+        height: '100%'
     },
     scrollView: {
         alignItems: 'center',
@@ -193,8 +253,15 @@ const styles = StyleSheet.create({
         borderRadius: 2,
 
     },
+    spacer: {
+        height: 25,
+    },
     request_text: {
         fontSize: 12,
         color: 'white',
+    },
+    calendar: {
+        width: 360,
+        marginTop: 25,
     }
 })

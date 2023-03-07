@@ -23,10 +23,10 @@ export default function PostHome({ navigation }) {
         Axios.get(`http://localhost:3001/post_status?user=${user}`)
         .then(res => {
             if (res.data.today == 1) {
-                setToday(`http://localhost:3001/gif?user=${user}&status=0`)
+                setToday(`http://localhost:3001/gif?user=${user}&status=0&hash=${Date.now()}`)
             } else setToday(null)
             if (res.data.yesterday == 1) {
-                setYesterday(`http://localhost:3001/gif?user=${user}&status=1`)
+                setYesterday(`http://localhost:3001/gif?user=${user}&status=1&hash=${Date.now()}`)
             } else setYesterday(null)
         })
         .catch(err => {
@@ -62,7 +62,7 @@ export default function PostHome({ navigation }) {
             if (today) {
                 return (
                         <ContextMenuView 
-                            key={'today_context'}
+                            key={today}
                             style={styles.image_cont}
                             menuConfig={{
                                 menuTitle: 'Post Options',
@@ -90,7 +90,7 @@ export default function PostHome({ navigation }) {
         } else if (option == 'yesterday') {
             if (yesterday) {
                 return (<ContextMenuView 
-                            key={'yesterday-context'}
+                            key={yesterday}
                             style={styles.image_cont}
                             menuConfig={{
                                 menuTitle: 'Post Options',

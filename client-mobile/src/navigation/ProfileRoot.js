@@ -9,6 +9,7 @@ import ProfileScreen from "./ProfileScreen";
 import RequestsScreen from "./RequestsScreen";
 import { Pressable, Text } from "react-native";
 import SettingsScreen from "./SettingsScreen";
+import PostView from "./PostView";
 
 
 
@@ -45,6 +46,14 @@ export default  function ProfileRoot({navigation, route}) {
               name="Profile2" 
               component={ProfileScreen} 
               options={() => ({title: ''})}
+            />
+            <Stack.Screen 
+                name="View" 
+                component={PostView}
+                options={() => ({
+                    title: '',
+                    headerShown: false,
+                })}
             />
         </Stack.Navigator>
     )

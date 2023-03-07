@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, Text, View, Image, Button, Platform, StyleSheet } from 'react-native';
+import { Pressable, Text, View, Image, Button, Platform, StyleSheet, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
@@ -97,8 +97,8 @@ const PostCreate = ({navigation}) => {
   }
 
   return (
-    <View >
-      <View style={styles.photos_container}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.photos_container}>
         {renderImages()}
 
         {images.length < 10 ? (
@@ -106,7 +106,7 @@ const PostCreate = ({navigation}) => {
             <Text style={styles.text}>+</Text>
           </Pressable>
         ) : <></>}
-      </View>
+      </ScrollView>
       <Pressable style={styles.post_button} onPress={() => uploadPhotos()}>
         <Text style={styles.post_text}>Post</Text>
       </Pressable>
@@ -118,12 +118,12 @@ export default PostCreate;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 2,
+    justifyContent: 'flex-end',
+    height: '100%'
   },
   photos_container: {
     paddingTop: 20,
     backgroundColor: 'white',
-    height: '92%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
@@ -145,10 +145,14 @@ const styles = StyleSheet.create({
       opacity: .6,
   },
   post_button: {
-    height: '8%',
+    height: '6%',
+    marginBottom: '4%',
+    marginTop: '2%',
+    width: '50%',
     backgroundColor: 'black',
     justifyContent: 'center',
     borderWidth: 2,
+    alignSelf: 'center'
   },
   text: {
       fontSize: 40,
@@ -156,7 +160,7 @@ const styles = StyleSheet.create({
       textAlign: 'center',
   },
   post_text: {
-    fontSize: 20,
+    fontSize: 14,
     color: 'white',
     textAlign: 'center',
   },

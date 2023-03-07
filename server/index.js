@@ -36,7 +36,7 @@ var db = new sqlite3.Database(DBSOURCE, (err) => {
             Post INTEGER
             )`, (err) => {
                 if (err) {
-                    //do nothing
+                    //console.log(err)
                 }
             });
         db.run(`CREATE TABLE Users (
@@ -46,17 +46,18 @@ var db = new sqlite3.Database(DBSOURCE, (err) => {
             Path TEXT
             )`, (err) => {
                 if (err) {
-                    //do nothing
+                    //console.log(err)
                 }
             });
         db.run(`CREATE TABLE Posts (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
             User TEXT,
             Path TEXT,
-            Status INTEGER
+            Status INTEGER,
+            Date TEXT
             )`, (err) => {
                 if (err) {
-                    //do nothing
+                    //console.log(err)
                 }
             });
         db.run(`CREATE TABLE Friends (
@@ -65,7 +66,7 @@ var db = new sqlite3.Database(DBSOURCE, (err) => {
             Status INTEGER
             )`, (err) => {
                 if (err) {
-                    //do nothing
+                    //console.log(err)
                 }
             });
     }
@@ -173,6 +174,9 @@ app.post('/register', (req, res) => {
 app.post('/create_post', (req, res) => {
     const user = req.body.user
 
+    let date = new Date();
+    date = date.toISOString().split('T')[0];
+
     let sql = 'SELECT Id id FROM Posts WHERE User = ? AND Status = 0'
 
     db.get(sql, [user], (err, row) => {
@@ -187,8 +191,8 @@ app.post('/create_post', (req, res) => {
                     } 
                 })
             }
-            sql = 'INSERT INTO Posts (User, Status) VALUES (?, 0)'
-            db.run(sql, [user], (err) => {
+            sql = 'INSERT INTO Posts (User, Status, Date) VALUES (?, 0, ?)'
+            db.run(sql, [user, date], (err) => {
                 if (err) {
                     console.log(err)
                 } else {
@@ -285,6 +289,27 @@ app.get('/gif', (req, res) => {
         })
     }
 }) 
+
+app.get('/gif/:id', (req, res) => {
+    const id = req.params.id
+    const sql = 'SELECT Path FROM Posts WHERE Id = ?'
+
+    db.get(sql, [id], (err, row) => {
+        if (err) {
+            console.log(err)
+        } else {
+            let path = row.Path
+            fs.readFile(path, function(err, data) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.set('Content-Type', 'image/gif')
+                    res.send(data);
+                }
+            });
+        }
+    })
+})
 
 app.get('/profile_picture', (req, res) => {
     const user = req.query.user
@@ -495,13 +520,30 @@ app.get('/post_status', (req, res) => {
     })
 })
 
+app.get('/:user/posts', (req, res) => {
+    const user = req.params.user
+    const sql = `SELECT Id, Date FROM Posts WHERE User = ? AND (Status = 2 OR Status = 1)`
+
+    db.all(sql, [user], (err, rows) => {
+        if (err) {
+            console.log(err)
+        } else {
+            data = []
+            rows.forEach((row) => {
+                data.push({id: row.Id, date: row.Date})
+            })
+            res.send(data)
+        }
+    })
+})
+
 function clear_posts() {
-    let sql = 'DELETE FROM Posts WHERE Status = 1'
+    let sql = 'UPDATE Posts SET Status = 2 WHERE Status = 1'
     db.all(sql, (err) => {
         if (err) {
             console.log(err)
         } else {
-            sql = 'UPDATE Posts SET Status = 1'
+            sql = 'UPDATE Posts SET Status = 1 WHERE Status = 0'
             db.all(sql, (err) => {
                 if (err) {
                     console.log(err)
@@ -512,7 +554,7 @@ function clear_posts() {
 }
 
 var now = new Date();
-var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 53, 0, 0) - now;
+var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 58, 0, 0) - now;
 if (mil_to_12 < 0) {
      mil_to_12 += 86400000; // it's after 10am, try 10am tomorrow.
 }

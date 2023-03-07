@@ -29,7 +29,13 @@ export default function PostRoot() {
                     ),
             })}
             />
-            <Stack.Screen name="PostCreate" component={PostCreate}/>
+            <Stack.Screen 
+                name="PostCreate" 
+                component={PostCreate}
+                options={() => ({
+                    title: 'Create'
+                })}
+            />
         </Stack.Navigator>
     )
 }
