@@ -308,9 +308,28 @@ app.get('/make_gif', (req, res) => {
 app.get('/gif', (req, res) => {
     const user = req.query.user
     const status = req.query.status
+    const id = req.query.id
     const sql = 'SELECT Path path FROM Posts WHERE User = ? AND Status = ?'
 
-    if (!user || !status) {
+    if (id) {
+        const sql = 'SELECT Path FROM Posts WHERE Id = ?'
+
+        db.get(sql, [id], (err, row) => {
+            if (err) {
+                console.log(err)
+            } else {
+                let path = row.Path
+                fs.readFile(path, function(err, data) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        res.set('Content-Type', 'image/gif')
+                        res.send(data);
+                    }
+                });
+            }
+        })
+    } else if (!user || !status) {
         res.sendStatus(404)
     } else {
         db.get(sql, [user, status], (err, row) => {
@@ -333,27 +352,6 @@ app.get('/gif', (req, res) => {
         })
     }
 }) 
-
-app.get('/gif/:id', (req, res) => {
-    const id = req.params.id
-    const sql = 'SELECT Path FROM Posts WHERE Id = ?'
-
-    db.get(sql, [id], (err, row) => {
-        if (err) {
-            console.log(err)
-        } else {
-            let path = row.Path
-            fs.readFile(path, function(err, data) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    res.set('Content-Type', 'image/gif')
-                    res.send(data);
-                }
-            });
-        }
-    })
-})
 
 app.get('/profile_picture', (req, res) => {
     const user = req.query.user
@@ -590,7 +588,7 @@ function clear_posts() {
 }
 
 var now = new Date();
-var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 58, 0, 0) - now;
+var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 28, 0, 0) - now;
 if (mil_to_12 < 0) {
      mil_to_12 += 86400000; // it's after 10am, try 10am tomorrow.
 }

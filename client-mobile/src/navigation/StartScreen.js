@@ -18,9 +18,8 @@ function StartScreen({ navigation }) {
 
   const styles = StyleSheet.create({
     container: {
-      paddingTop: 650,
-      paddingBottom: 0,
-      backgroundColor: 'white',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
       height: '100%',
     },
     input: {
@@ -30,15 +29,18 @@ function StartScreen({ navigation }) {
         padding: 10,
     },
     signin_button: {
-        height: 35,
+        height: '5%',
+        width: '90%',
         margin: 12,
         borderWidth: 1,
         borderRadius: 2,
         justifyContent: 'center',
     },
     register_button: {
-        height: 35,
+        height: '5%',
+        width: '90%',
         margin: 12,
+        marginBottom: '15%',
         borderRadius: 2,
         justifyContent: 'center',
         backgroundColor: 'black'

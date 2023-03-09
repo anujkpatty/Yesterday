@@ -13,6 +13,8 @@ import {
   RefreshControl,
 } from 'react-native';
 
+const URL = 'http://localhost:3001'
+
 function HomeScreen({navigation}) {
 
     const [users, setUsers] = useState(null)
@@ -27,7 +29,7 @@ function HomeScreen({navigation}) {
 
     const getPosts = async () => {
       const curUser = await SecureStore.getItemAsync('userToken')
-      Axios.get(`http://localhost:3001/feed?user=${curUser}`, {})
+      Axios.get(URL +`/feed?user=${curUser}`, {})
         .then(res => {
             setUsers([...res.data])
         })
@@ -36,12 +38,12 @@ function HomeScreen({navigation}) {
 
     const renderPosts = (names) => {
       console.log("here")
-      return names.map(name => <Image key={name} source={{uri: `http://localhost:3001/gif?user=${name}`}} alt="" style = {{width: 300, height: 400}} />)
+      return names.map(name => <Image key={name} source={{uri: `${URL}/gif?user=${name}`}} alt="" style = {{width: 300, height: 400}} />)
     }
 
     const Item = ({name}) => (
       <>
-        <Image key={name} source={{uri: `http://localhost:3001/gif?user=${name}&status=1`}} alt="" style = {styles.image} />
+        <Image key={name} source={{uri: `${URL}/gif?user=${name}&status=1`}} alt="" style = {styles.image} />
         <Text style={styles.text}>{name}</Text>
       </>
     );

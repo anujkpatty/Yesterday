@@ -23,6 +23,8 @@ import {
     } from 'react-native';
 import Axios from 'axios';
 
+const URL = 'http://localhost:3001'
+
 export default function ProfileScreen({ navigation, route }) {
     //relation state 0 == requested, 1 == request pending, 2 == accepted, 3 == not friends, 4 == same user
     const [relation, setRelation] = useState(null)
@@ -33,6 +35,8 @@ export default function ProfileScreen({ navigation, route }) {
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
+        getProfile()
+        getRelation()
         setRefreshing(false)
         
     }, []);
@@ -56,7 +60,7 @@ export default function ProfileScreen({ navigation, route }) {
           );
           try {
             const curUser = await SecureStore.getItemAsync('userToken') 
-            let res = await FileSystem.uploadAsync(`http://localhost:3001/profile_picture?user=${curUser}`, image.uri, {
+            let res = await FileSystem.uploadAsync(`${URL}/profile_picture?user=${curUser}`, image.uri, {
               fieldName: 'image',
               httpMethod: 'POST',
               uploadType: FileSystem.FileSystemUploadType.MULTIPART,
@@ -70,13 +74,13 @@ export default function ProfileScreen({ navigation, route }) {
       };
 
     function getProfile() {
-        Axios.get(`http://localhost:3001/${route.params.user}/posts`)
+        Axios.get(`${URL}/${route.params.user}/posts`)
         .then(res => {
             setPosts(res.data)
         })
         .catch(err => console.log(err))       
 
-        setProfilePic(`http://localhost:3001/profile_picture?user=${route.params.user}&hash=${Date.now()}`)
+        setProfilePic(`${URL}/profile_picture?user=${route.params.user}&hash=${Date.now()}`)
     }
 
     async function getRelation() {
@@ -84,7 +88,7 @@ export default function ProfileScreen({ navigation, route }) {
         if (curUser == route.params.user) {
             setRelation(4)
         } else {
-            Axios.get(`http://localhost:3001/relation?user_1=${curUser}&user_2=${route.params.user}`)
+            Axios.get(`${URL}/relation?user_1=${curUser}&user_2=${route.params.user}`)
             .then(res => {
                 setRelation(res.data.relation)
             })
@@ -99,7 +103,7 @@ export default function ProfileScreen({ navigation, route }) {
 
 
     async function addFriend() {
-        Axios.post('http://localhost:3001/add_friend', {
+        Axios.post(URL + '/add_friend', {
             user_one: await SecureStore.getItemAsync('userToken'), 
             user_two: route.params.user,
         })
@@ -107,7 +111,7 @@ export default function ProfileScreen({ navigation, route }) {
     }
 
     async function removeFriend() {
-        Axios.put('http://localhost:3001/remove_friend', {
+        Axios.put(URL + '/remove_friend', {
             user_one: await SecureStore.getItemAsync('userToken'), 
             user_two: route.params.user,
         })
@@ -115,7 +119,7 @@ export default function ProfileScreen({ navigation, route }) {
     }
 
     async function acceptFriend() {
-        Axios.put('http://localhost:3001/accept', {
+        Axios.put(URL + '/accept', {
             user_two: await SecureStore.getItemAsync('userToken'), 
             user_one: route.params.user,
         })

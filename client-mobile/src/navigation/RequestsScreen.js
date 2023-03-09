@@ -4,13 +4,15 @@ import * as SecureStore from 'expo-secure-store';
 import { Text, View, Image, TextInput, Button, StyleSheet, Pressable } from 'react-native';
 import Axios from 'axios';
 
+const URL = 'http://localhost:3001'
+
 export default function RequestsScreen({navigation}) {
 
     const [requests, setRequests] = useState([])
 
     async function getRequests() {
         const curUser = await SecureStore.getItemAsync('userToken')
-        Axios.get(`http://localhost:3001/requests?user=${curUser}`)
+        Axios.get(`${URL}/requests?user=${curUser}`)
         .then(res => setRequests([...res.data]))
         .catch(err => console.log(err))
     }
@@ -19,7 +21,7 @@ export default function RequestsScreen({navigation}) {
         return(
             <Pressable onPress={() => navigation.push('Profile2', {user: props.user})}>
                 <View style={styles.result}>
-                    <Image source={{uri: `http://localhost:3001/profile_picture?user=${props.user}`}} alt="" style = {styles.profile} />
+                    <Image source={{uri: `${URL}/profile_picture?user=${props.user}`}} alt="" style = {styles.profile} />
                     <Text style={styles.username}>{props.user}</Text>
                 </View>
             </Pressable> 

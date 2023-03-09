@@ -8,7 +8,7 @@ import { ContextMenuView } from 'react-native-ios-context-menu';
 import { Alert } from "react-native";
 
 
-
+const URL = 'http://localhost:3001'
 
 export default function PostHome({ navigation }) {
 
@@ -20,13 +20,13 @@ export default function PostHome({ navigation }) {
 
     const getPosts = async () => {
         const user = await SecureStore.getItemAsync('userToken')
-        Axios.get(`http://localhost:3001/post_status?user=${user}`)
+        Axios.get(URL + `/post_status?user=${user}`)
         .then(res => {
             if (res.data.today == 1) {
-                setToday(`http://localhost:3001/gif?user=${user}&status=0&hash=${Date.now()}`)
+                setToday(URL + `/gif?user=${user}&status=0&hash=${Date.now()}`)
             } else setToday(null)
             if (res.data.yesterday == 1) {
-                setYesterday(`http://localhost:3001/gif?user=${user}&status=1&hash=${Date.now()}`)
+                setYesterday(URL + `/gif?user=${user}&status=1&hash=${Date.now()}`)
             } else setYesterday(null)
         })
         .catch(err => {
@@ -50,7 +50,7 @@ export default function PostHome({ navigation }) {
 
         console.log(user , status)
 
-        Axios.put('http://localhost:3001/post', {user: user, status: status})
+        Axios.put(URL + '/post', {user: user, status: status})
         .then((res) => getPosts())
         .catch(err => console.log(err))
 

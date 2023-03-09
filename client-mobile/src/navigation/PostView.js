@@ -4,12 +4,14 @@ import * as SecureStore from 'expo-secure-store';
 import { Text, View, Image, StyleSheet } from 'react-native';
 import Axios from 'axios';
 
+const URL = 'http://localhost:3001'
+
 function PostView({ navigation, route }) {
 
   const [gif, setGif] = useState(null)
 
   const getGif = async () => {
-    setGif(`http://localhost:3001/gif/${route.params.id}`)
+    setGif(`${URL}/gif?id=${route.params.id}`)
   }
 
   useEffect(() => {

@@ -1,11 +1,17 @@
 {
   "expo": {
     "name": "yesterday-app",
-    "slug": "yesterday-app",
+    "slug": "yesterday",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c9df7f2f-790f-454f-b195-6ba3b2a418c9"
+      }
+    },
+    "owner": "anujkpatty"
   },
   "name": "yesterday-app"
 }

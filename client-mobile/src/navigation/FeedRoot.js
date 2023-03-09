@@ -7,6 +7,7 @@ import HomeScreen from "./HomeScreen";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ProfileScreen from "./ProfileScreen";
+import PostView from "./PostView";
 import * as SecureStore from 'expo-secure-store';
 
 const Stack = createNativeStackNavigator();
@@ -40,7 +41,15 @@ export default function FeedRoot() {
                 options={({ route, navigation }) => ({
                     title: '',
                 })}
-                />
+            />
+            <Stack.Screen 
+                name="View" 
+                component={PostView}
+                options={() => ({
+                    title: '',
+                    headerShown: false,
+                })}
+            />
         </Stack.Navigator>
     )
 }

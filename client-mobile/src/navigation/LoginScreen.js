@@ -3,19 +3,10 @@ import { Text, TextInput, View, Button, StyleSheet, Pressable } from 'react-nati
 import Axios from "axios";
 import { AuthContext } from './../AuthContext.js';
 
+
 function LoginScreen({ navigation }) {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
-  
-    // function handleLogin() {
-    //     const data = { username: username,
-    //                    password, password}
-        
-    //     Axios.post("http://localhost:3001/login", data)
-    //     .then(res => console.log(res.data.user))
-    //     .catch(err => alert('Invalid username or password'));
-    // }
-
     const { signIn } = React.useContext(AuthContext);
 
   

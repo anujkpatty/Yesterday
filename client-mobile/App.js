@@ -21,6 +21,7 @@ import FeedRoot from './src/navigation/FeedRoot';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const URL = 'http://localhost:3001'
 
 export default function App() {
   const [state, dispatch] = React.useReducer(
@@ -85,8 +86,8 @@ export default function App() {
         let { username, password } = data
 
         username = username.toLowerCase();
-
-        Axios.post("http://localhost:3001/login", { username: username, password: password })
+        
+        Axios.post(URL + "/login", { username: username, password: password })
         .then(res => {
           SecureStore.setItemAsync('userToken', res.data.user)
           dispatch({ type: 'SIGN_IN', token: res.data.user});
@@ -123,7 +124,7 @@ export default function App() {
           return
         }
 
-        Axios.post("http://localhost:3001/register", { username: username, password: password })
+        Axios.post(URL + "/register", { username: username, password: password })
         .then(res => {
           SecureStore.setItemAsync('userToken', res.data.user)
           dispatch({ type: 'SIGN_IN', token: res.data.user});

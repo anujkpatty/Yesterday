@@ -9,7 +9,7 @@ import Axios from 'axios';
 import { StackActions } from '@react-navigation/native';
 
 
-const SERVER_URL = 'http://localhost:3001';
+const URL = 'http://localhost:3001';
 
 const PostCreate = ({navigation}) => {
   const [images, setImages] = useState([])
@@ -49,7 +49,7 @@ const PostCreate = ({navigation}) => {
   };
 
   async function createPost() {
-    let response = await Axios.post('http://localhost:3001/create_post', { user: await SecureStore.getItemAsync('userToken') })
+    let response = await Axios.post(URL + '/create_post', { user: await SecureStore.getItemAsync('userToken') })
     return response.data.postid;
   }
 
@@ -66,7 +66,7 @@ const PostCreate = ({navigation}) => {
         const user = await SecureStore.getItemAsync('userToken')
     
         try {
-          await FileSystem.uploadAsync(`http://localhost:3001/upload_single`, image.uri, {
+          await FileSystem.uploadAsync(URL + `/upload_single`, image.uri, {
             fieldName: 'image',
             httpMethod: 'POST',
             uploadType: FileSystem.FileSystemUploadType.MULTIPART,
@@ -78,7 +78,7 @@ const PostCreate = ({navigation}) => {
 
       }
 
-      await Axios.get(`http://localhost:3001/make_gif?postid=${postid}`)
+      await Axios.get(URL + `/make_gif?postid=${postid}`)
 
       navigation.dispatch(StackActions.popToTop())
 
