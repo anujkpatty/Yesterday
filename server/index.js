@@ -588,7 +588,7 @@ function clear_posts() {
 }
 
 var now = new Date();
-var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 28, 0, 0) - now;
+var mil_to_12 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 33, 0, 0) - now;
 if (mil_to_12 < 0) {
      mil_to_12 += 86400000; // it's after 10am, try 10am tomorrow.
 }

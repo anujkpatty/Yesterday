@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Button, Text, TextInput, View } from 'react-native';
+import { Button, Text, TextInput, View, ActivityIndicator } from 'react-native';
 
 function SplashScreen() {
     return (
       <View>
-        <Text>Loading...</Text>
+        <ActivityIndicator size={'large'}/>
       </View>
     );
 }

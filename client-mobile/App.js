@@ -119,7 +119,7 @@ export default function App() {
         } else if (username.length > 12) {
           Alert.alert('Error', 'Username must be less than 13 characters')
           return
-        } else if (password.length < 8) {
+        } else if (password.length < 4) {
           Alert.alert('Error', 'Password must be at least 8 characters')
           return
         }

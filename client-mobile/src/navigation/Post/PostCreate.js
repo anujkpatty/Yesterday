@@ -7,12 +7,14 @@ import * as SecureStore from 'expo-secure-store';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import Axios from 'axios';
 import { StackActions } from '@react-navigation/native';
+import SplashScreen from '../SplashScreen';
 
 
 const URL = 'http://localhost:3001';
 
 const PostCreate = ({navigation}) => {
   const [images, setImages] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const pickImage = async (index) => {
     // No permissions request is necessary for launching the image library
@@ -55,7 +57,10 @@ const PostCreate = ({navigation}) => {
 
   async function uploadPhotos() {
 
+   
+
     if (images[0] && images[1]) {
+      setLoading(true)
 
       const postid = await createPost();
 
@@ -82,6 +87,8 @@ const PostCreate = ({navigation}) => {
 
       navigation.dispatch(StackActions.popToTop())
 
+      setLoading(false)
+
     } else {
       alert('Post must contain at least 2 images')
     }
@@ -97,20 +104,31 @@ const PostCreate = ({navigation}) => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.photos_container}>
-        {renderImages()}
+    <>
+      {loading ? (
+        <View style={styles.splash_container}>
+          <SplashScreen/>
+        </View>
+        ) : (
+          <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.photos_container}>
+              {renderImages()}
 
-        {images.length < 10 ? (
-          <Pressable style={styles.button} onPress={() => pickImage()}>
-            <Text style={styles.text}>+</Text>
-          </Pressable>
-        ) : <></>}
-      </ScrollView>
-      <Pressable style={styles.post_button} onPress={() => uploadPhotos()}>
-        <Text style={styles.post_text}>Post</Text>
-      </Pressable>
-    </View>
+              {images.length < 10 ? (
+                <Pressable style={styles.button} onPress={() => pickImage()}>
+                  <Text style={styles.text}>+</Text>
+                </Pressable>
+              ) : <></>}
+            </ScrollView>
+            <Pressable style={styles.post_button} onPress={() => {
+              uploadPhotos()
+              }}>
+              <Text style={styles.post_text}>Post</Text>
+            </Pressable>
+          </View>
+        
+      )}
+    </>
   );
 };
 
@@ -120,6 +138,11 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'flex-end',
     height: '100%'
+  },
+  splash_container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
   },
   photos_container: {
     paddingTop: 20,
