@@ -1,16 +1,18 @@
 import React from "react";
-import { Text, TextInput, View, Button, StyleSheet, Pressable } from 'react-native';
+import { Text, TextInput, View, Button, StyleSheet, Pressable, Image } from 'react-native';
 
 function StartScreen({ navigation }) {
   
     return (
         <View style={styles.container}>
+            <Image style={styles.logo} source={require('../../assets/yesterday-logo.png')}/>
             <Pressable style={styles.signin_button} onPress={() => navigation.navigate('LogIn')}>
                 <Text style={styles.text}>Sign in</Text>
             </Pressable>
             <Pressable style={styles.register_button} onPress={() => navigation.navigate('Register')}>
                 <Text style={styles.register_text}>Create a new account</Text>
             </Pressable>
+            
         </View>
     );
   }
@@ -21,6 +23,10 @@ function StartScreen({ navigation }) {
       justifyContent: 'flex-end',
       alignItems: 'center',
       height: '100%',
+    },
+    logo: {
+        height: '50%',
+        width: '80%',
     },
     input: {
         height: 35,
@@ -35,6 +41,7 @@ function StartScreen({ navigation }) {
         borderWidth: 1,
         borderRadius: 2,
         justifyContent: 'center',
+        backgroundColor: 'white',
     },
     register_button: {
         height: '5%',
